@@ -206,13 +206,19 @@ const createContext = (swagger) => {
 /**
  * 主函数入口（无状态）
  */
-const main = async (swaggerSource, apiPathsParams) => {
+const generateTypes = async (swaggerSource, apiPathsParams) => {
+  console.log(
+    "🚀 ~ generateTypes ~ swaggerSource, apiPathsParams:",
+    swaggerSource,
+    apiPathsParams
+  );
   const apiPaths = apiPathsParams
     .split(",")
     .map((p) => p.trim())
     .filter(Boolean);
   try {
     const swagger = await fetch(swaggerSource).then((res) => res.json());
+    console.log("🚀 ~ generateTypes ~ swagger:", swagger);
     const ctx = createContext(swagger);
     const allOutput = [];
 
@@ -233,7 +239,6 @@ const main = async (swaggerSource, apiPathsParams) => {
     return allOutput.join("\n");
   } catch (e) {
     console.error(`❌ 加载失败: ${e.message}`);
+    throw e;
   }
 };
-
-module.exports = main;

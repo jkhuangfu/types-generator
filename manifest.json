@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "OpenAPI Type Generator",
+  "version": "1.0",
+  "description": "从OpenAPI文档生成TypeScript类型定义",
+  "action": {
+    "default_icon": {
+      "16": "html/icon.png",
+      "48": "html/icon.png",
+      "128": "html/icon.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "icons": {
+    "16": "html/icon.png",
+    "48": "html/icon.png",
+    "128": "html/icon.png"
+  }
+}
