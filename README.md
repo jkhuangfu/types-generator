@@ -2,6 +2,8 @@
 
 一个基于 Node.js 的轻量级工具，能够将 OpenAPI/Swagger 规范自动转换为 TypeScript 类型定义文件（.d.ts）。提供 Web 界面和 API 接口，支持 OpenAPI 2.0 和 3.0+ 规范。
 
+- **[main 分支 - Node.js 服务版本](https://github.com/jkhuangfu/types-generator)** （当前）
+- **[chrome 分支 - 浏览器插件版本](https://github.com/jkhuangfu/types-generator/tree/chrome)**
 
 ## 🚀 快速开始
 
@@ -31,4 +33,3 @@ node index.js
 3. 点击 **请求并展示 d.ts** 按钮
 4. 查看生成的 TypeScript 类型定义
 5. 使用 **复制** 或 **下载 .d.ts** 按钮获取代码
-
