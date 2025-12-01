@@ -1,4 +1,15 @@
-# OpenAPI Type Generator - Chrome 插件版本
+# OpenAPI Type Generator
+
+从 OpenAPI 文档生成 TypeScript 类型定义的工具，支持多种使用方式。
+
+## 🌟 版本分支
+
+- **[main 分支 - Node.js 服务版本](https://github.com/jkhuangfu/types-generator)**
+- **[chrome 分支 - 浏览器插件版本](https://github.com/jkhuangfu/types-generator/tree/chrome)**（当前）
+
+---
+
+## Chrome 插件版本说明
 
 这是一个 Chrome 浏览器插件，可以从 OpenAPI 文档生成 TypeScript 类型定义。
 
