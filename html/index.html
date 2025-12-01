@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OpenAPI → TypeScript 代码预览</title>
+    <link
+      rel="stylesheet"
+      href="./prism-tomorrow.min.css"
+    />
+    <script src="./prism.min.js"></script>
+    <script src="./prism-typescript.min.js"></script>
+    <style>
+      body {
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #f1f5f9;
+        margin: 0;
+        padding: 2rem;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1080px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      }
+      input {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.5rem;
+        border: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        margin-bottom: 1rem;
+      }
+      button {
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.6rem;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+        margin-right: 0.6rem;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      pre {
+        max-height: 60vh;
+        overflow: auto;
+        border-radius: 0.6rem;
+        background: #1e293b !important;
+      }
+      .error {
+        color: #f87171;
+        font-size: 0.9rem;
+      }
+      .footer {
+        font-size: 0.8rem;
+        opacity: 0.6;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>OpenAPI 类型生成器</h2>
+
+      <input id="openapiUrl" placeholder="输入openapi json地址" />
+      <input id="apiPath" placeholder="请求路径,多个采用英文,隔开" />
+
+      <div>
+        <button id="fetchBtn">请求并展示 d.ts</button>
+        <button id="copyBtn" disabled>复制</button>
+        <button id="downloadBtn" disabled>下载 .d.ts</button>
+      </div>
+
+      <div id="error" class="error"></div>
+
+      <pre id="codeContainer" class="language-typescript" style="display:none;"><code id="code"></code></pre>
+      
+      <style>
+        /* 美化滚动条样式 - 应用到pre元素 */
+        #codeContainer {
+          max-height: 60vh;
+          overflow: auto;
+          scrollbar-width: thin; /* Firefox */
+          scrollbar-color: #666 #2d2d2d;
+        }
+        
+        /* WebKit浏览器滚动条样式 */
+        #codeContainer::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        #codeContainer::-webkit-scrollbar-track {
+          background: #2d2d2d;
+          border-radius: 4px;
+        }
+        
+        #codeContainer::-webkit-scrollbar-thumb {
+          background-color: #666;
+          border-radius: 4px;
+          border: 2px solid #2d2d2d;
+        }
+        
+        #codeContainer::-webkit-scrollbar-thumb:hover {
+          background-color: #888;
+        }
+        
+        /* 同时确保code元素的样式不干扰滚动 */
+        #code {
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+      </style>
+
+    </div>
+
+    <script>
+      const openapiUrlInput = document.getElementById('openapiUrl');
+      const apiPathInput = document.getElementById('apiPath');
+      const fetchBtn = document.getElementById('fetchBtn');
+      const copyBtn = document.getElementById('copyBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const codeContainer = document.getElementById('codeContainer');
+      const codeBlock = document.getElementById('code');
+      const errorDiv = document.getElementById('error');
+
+      fetchBtn.addEventListener('click', async () => {
+        const openapiUrl = openapiUrlInput.value.trim();
+        const apiPath = apiPathInput.value.trim();
+        errorDiv.textContent = '';
+        codeContainer.style.display = 'none';
+        codeBlock.textContent = '';
+
+        if (!openapiUrl) {
+          errorDiv.textContent = '请填写 openapiUrl';
+          return;
+        }
+
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = '请求中...';
+        try {
+          const res = await fetch('/api/fetch-openapi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ openapiUrl, apiPath }),
+          })
+          .then(response => {
+            // 检查响应状态
+            if (!response.ok) {
+              throw new Error('Network response was not ok: ' + response.status);
+            }
+            return response.text();
+          })
+          .then(text => {
+            codeBlock.textContent = text || '未返回任何类型定义';
+            Prism.highlightElement(codeBlock);
+            codeContainer.style.display = 'block';
+            copyBtn.disabled = false;
+            downloadBtn.disabled = false;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            codeBlock.textContent = '请求出错: ' + error.message;
+            codeContainer.style.display = 'block';
+          });
+
+          
+        } catch (e) {
+          errorDiv.textContent = e.message;
+        } finally {
+          fetchBtn.disabled = false;
+          fetchBtn.textContent = '请求并展示 TypeScript';
+        }
+      });
+
+      copyBtn.addEventListener('click', async () => {
+        const text = codeBlock.textContent;
+        if (!text) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          alert('已复制到剪贴板');
+        } catch {
+          alert('复制失败，请手动复制');
+        }
+      });
+
+      downloadBtn.addEventListener('click', () => {
+        const text = codeBlock.textContent;
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/typescript;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (apiPathInput.value || 'openapi').replace(/[^a-z0-9.-_]/gi, '_') + '.d.ts';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    </script>
+  </body>
+</html>
