@@ -13,13 +13,8 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [
-    "activeTab",
-    "tabs"
-  ],
-  "host_permissions": [
-    "*://*/*"
-  ],
+  "permissions": ["activeTab", "tabs"],
+  "host_permissions": ["*://*/*"],
   "icons": {
     "16": "html/icon.png",
     "48": "html/icon.png",
