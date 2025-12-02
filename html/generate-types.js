@@ -55,6 +55,9 @@ const createContext = (swagger) => {
     return "any";
   };
 
+  /** 格式化name 用于去除`-`等特殊字符 */
+  const formatName = (name) => name.replace(/-/g, "_");
+
   /** 递归生成 TypeScript 接口定义 */
   const schemaToTs = (schema, name, extraInterfaces) => {
     if (!schema || typeCache.has(name)) return "";
@@ -89,10 +92,10 @@ const createContext = (swagger) => {
         return `${comment}${key}${required}: ${type};`;
       });
 
-      return `interface ${name} {\n  ${lines.join("\n  ")}\n}`;
+      return `interface ${formatName(name)} {\n  ${lines.join("\n  ")}\n}`;
     }
 
-    return `type ${name} = ${resolveType(schema)};`;
+    return `type ${formatName(name)} = ${resolveType(schema)};`;
   };
 
   /** 判断是否 OpenAPI2 */
@@ -207,18 +210,12 @@ const createContext = (swagger) => {
  * 主函数入口（无状态）
  */
 const generateTypes = async (swaggerSource, apiPathsParams) => {
-  console.log(
-    "🚀 ~ generateTypes ~ swaggerSource, apiPathsParams:",
-    swaggerSource,
-    apiPathsParams
-  );
   const apiPaths = apiPathsParams
     .split(",")
     .map((p) => p.trim())
     .filter(Boolean);
   try {
     const swagger = await fetch(swaggerSource).then((res) => res.json());
-    console.log("🚀 ~ generateTypes ~ swagger:", swagger);
     const ctx = createContext(swagger);
     const allOutput = [];
 
