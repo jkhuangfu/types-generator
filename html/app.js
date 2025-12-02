@@ -7,6 +7,8 @@ const codeContainer = document.getElementById("codeContainer");
 const codeBlock = document.getElementById("code");
 const errorDiv = document.getElementById("error");
 
+openapiUrlInput.value = localStorage.getItem("openapiUrl") || "";
+
 fetchBtn.addEventListener("click", async () => {
   const openapiUrl = openapiUrlInput.value.trim();
   const apiPath = apiPathInput.value.trim();
@@ -18,6 +20,13 @@ fetchBtn.addEventListener("click", async () => {
     errorDiv.textContent = "请填写 openapiUrl";
     return;
   }
+
+  if (!apiPath) {
+    errorDiv.textContent = "请填写 apiPath";
+    return;
+  }
+
+  localStorage.setItem("openapiUrl", openapiUrl);
 
   fetchBtn.disabled = true;
   fetchBtn.textContent = "生成中...";
@@ -44,7 +53,7 @@ copyBtn.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(text);
     alert("已复制到剪贴板");
-  } catch(e){
+  } catch (e) {
     alert("复制失败，请手动复制");
   }
 });
@@ -58,9 +67,8 @@ downloadBtn.addEventListener("click", () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = 
-    (apiPathInput.value || "openapi").replace(/[^a-z0-9.-_]/gi, "_") + 
-    ".d.ts";
+  a.download =
+    (apiPathInput.value || "openapi").replace(/[^a-z0-9.-_]/gi, "_") + ".d.ts";
   document.body.appendChild(a);
   a.click();
   a.remove();
